@@ -33,6 +33,17 @@ npx eas-cli build --platform android --profile production
 npx eas-cli build --platform ios --profile production
 ```
 
+### Make an Android APK people can install directly
+
+The GitHub workflow at `.github/workflows/build-android-apk.yml` builds a signed APK with EAS and saves it as `ExpenseIQ.apk`. Before using it:
+
+1. Run `npx eas-cli init` in this project and commit the generated EAS project ID in `app.json`.
+2. In GitHub, add a repository Actions secret named `EXPO_TOKEN` for an Expo account that can build this project. EAS must have Android signing credentials configured; the first build can create and store an Android keystore on EAS.
+3. Upload this project folder as the repository contents. In the repository's **Actions** tab, run **Build installable ExpenseIQ APK**. Download the `ExpenseIQ-Android-APK` workflow artifact after it completes.
+4. To have GitHub attach the APK to a Release, push a tag such as `expenseiq-v1.0.1`. The workflow builds the APK and creates a GitHub Release with the file attached.
+
+The workflow artifact expires after 30 days. A GitHub Release asset remains available until that release is removed. Android may ask the recipient to allow installation from their browser or file manager. An APK is for direct Android installation; upload the production `.aab` to Google Play. iPhone/iPad users cannot install an APK; they need an iOS build distributed through TestFlight or the App Store.
+
 The Android production artifact is an `.aab`. EAS creates the signed iOS `.ipa` using the developer's Apple signing credentials. Upload Android to a Play Console testing track and iOS to TestFlight first. EAS Submit can upload a completed binary; it does not fill in store listing content, pass review, or release the app automatically. See [Expo's store submission guide](https://docs.expo.dev/deploy/submit-to-app-stores/) and [iOS EAS submission guide](https://docs.expo.dev/submit/ios/).
 
 ## Checklist before a public store submission
