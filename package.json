@@ -1,0 +1,31 @@
+{
+  "name": "expenseiq-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "expo": "~58.0.0",
+    "expo-crypto": "~58.0.0",
+    "expo-linear-gradient": "~58.0.0",
+    "expo-sqlite": "~58.0.14",
+    "expo-secure-store": "~58.0.2",
+    "expo-status-bar": "~58.0.0",
+    "lucide-react-native": "^0.468.0",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.24.0",
+    "react-native-svg": "15.16.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
+  }
+}

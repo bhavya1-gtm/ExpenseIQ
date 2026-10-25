@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "ExpenseIQ",
+    "slug": "expenseiq",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "expenseiq",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.expenseiq.ai",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.expenseiq.ai",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#315B43"
+      },
+      "permissions": []
+    },
+    "icon": "./assets/icon.png",
+    "plugins": [["expo-sqlite", { "useSQLCipher": true }], "expo-secure-store"]
+  }
+}
