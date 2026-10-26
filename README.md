@@ -1,4 +1,4 @@
-# enseIQ — iOS and Android app
+# ExpenseIQ — iOS and Android app
 
 This is the native mobile project for the ExpenseIQ brief. It uses React Native, Expo SDK 58, TypeScript, local SQLite storage, and EAS build profiles. The previous `outputs/index.html` is a browser-only visual preview; this folder is the mobile app.
 
@@ -12,7 +12,26 @@ This is the native mobile project for the ExpenseIQ brief. It uses React Native,
 
 The visible financial records and AI answers are sample data. The app is suitable for internal device builds and product review once dependencies are installed. It is not yet a complete personal finance service: online authentication, server sync, licensed Open Banking / Account Aggregator consent, real AI, transaction editing/categorization, budgeting and goal creation, notifications, reports, and admin tools are not implemented. Do not present sample records as real account activity in a store listing.
 
-## Run and create store builds
+## For people installing ExpenseIQ
+
+End users do **not** need EAS CLI, Node.js, Expo, or this source code. On Android, download `ExpenseIQ.apk` from the project's GitHub **Releases** page, open it on the phone, and follow Android's install prompt. iPhone and iPad users need an App Store or TestFlight build; Android APK files do not install on iOS.
+
+## Publisher setup (one time; not needed by app users)
+
+The APK build runs on GitHub Actions. EAS CLI is invoked inside that workflow, so each person downloading the app does not install or run EAS CLI. The repository owner needs an Expo project and a single GitHub Actions secret (`EXPO_TOKEN`) so GitHub can build and sign the Android APK.
+
+To link the project once and save its EAS project ID in `app.json`, the publisher runs:
+
+```sh
+npx eas-cli login
+npx eas-cli init
+```
+
+Then add the `EXPO_TOKEN` secret in GitHub repository settings. After that, the publisher can use **Actions → Build installable ExpenseIQ APK** or push a tag such as `expenseiq-v1.0.1` to have GitHub build an APK and attach it to a Release. The user-facing download is the APK asset on that Release.
+
+The workflow artifact expires after 30 days. A GitHub Release asset remains available until that release is removed. Android may ask the recipient to allow installation from their browser or file manager.
+
+## Developer setup and store builds
 
 Use Node.js 22.13 or newer. From this folder:
 
@@ -22,27 +41,14 @@ npx expo install --fix
 npx expo start
 ```
 
-SQLCipher is a native module and does not run in the standard Expo Go client. Use a development build (`npx eas-cli build --profile development --platform android` or `ios`) or a production store build for runtime review.
+SQLCipher is a native module and does not run in the standard Expo Go client. Use an EAS development build or a production store build for runtime review.
 
-Before building, replace the example reverse-domain identifiers in `app.json` with identifiers controlled by the publisher, then link this folder to the publisher's Expo account:
+Before building store releases, replace the example reverse-domain identifiers in `app.json` with identifiers controlled by the publisher, then create store builds:
 
 ```sh
-npx eas-cli login
-npx eas-cli init
 npx eas-cli build --platform android --profile production
 npx eas-cli build --platform ios --profile production
 ```
-
-### Make an Android APK people can install directly
-
-The GitHub workflow at `.github/workflows/build-android-apk.yml` builds a signed APK with EAS and saves it as `ExpenseIQ.apk`. Before using it:
-
-1. Run `npx eas-cli init` in this project and commit the generated EAS project ID in `app.json`.
-2. In GitHub, add a repository Actions secret named `EXPO_TOKEN` for an Expo account that can build this project. EAS must have Android signing credentials configured; the first build can create and store an Android keystore on EAS.
-3. Upload this project folder as the repository contents. In the repository's **Actions** tab, run **Build installable ExpenseIQ APK**. Download the `ExpenseIQ-Android-APK` workflow artifact after it completes.
-4. To have GitHub attach the APK to a Release, push a tag such as `expenseiq-v1.0.1`. The workflow builds the APK and creates a GitHub Release with the file attached.
-
-The workflow artifact expires after 30 days. A GitHub Release asset remains available until that release is removed. Android may ask the recipient to allow installation from their browser or file manager. An APK is for direct Android installation; upload the production `.aab` to Google Play. iPhone/iPad users cannot install an APK; they need an iOS build distributed through TestFlight or the App Store.
 
 The Android production artifact is an `.aab`. EAS creates the signed iOS `.ipa` using the developer's Apple signing credentials. Upload Android to a Play Console testing track and iOS to TestFlight first. EAS Submit can upload a completed binary; it does not fill in store listing content, pass review, or release the app automatically. See [Expo's store submission guide](https://docs.expo.dev/deploy/submit-to-app-stores/) and [iOS EAS submission guide](https://docs.expo.dev/submit/ios/).
 
