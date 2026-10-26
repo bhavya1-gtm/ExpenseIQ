@@ -1,0 +1,57 @@
+name: Build installable ExpenseIQ APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'expenseiq-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Align native packages with Expo SDK
+        run: npx expo install --fix
+
+      - name: Build signed Android APK with EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli build --platform android --profile installable --non-interactive --wait --json > eas-build.json
+
+      - name: Download the APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        shell: bash
+        run: |
+          BUILD_ID="$(node -e "const d=require('./eas-build.json'); const b=Array.isArray(d)?d[0]:(d.build||d); if(!b.id) throw new Error('EAS did not return a build ID'); process.stdout.write(b.id)")"
+          npx eas-cli build:download --build-id "$BUILD_ID" --non-interactive --json > eas-download.json
+          APK_PATH="$(node -e "const d=require('./eas-download.json'); if(!d.path) throw new Error('EAS did not return an APK path'); process.stdout.write(d.path)")"
+          cp "$APK_PATH" "$GITHUB_WORKSPACE/ExpenseIQ.apk"
+
+      - name: Save APK as a downloadable workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExpenseIQ-Android-APK
+          path: ExpenseIQ.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach APK to the GitHub release
+        if: startsWith(github.ref, 'refs/tags/expenseiq-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" ExpenseIQ.apk --title "ExpenseIQ $GITHUB_REF_NAME" --generate-notes
